@@ -69,7 +69,7 @@ local function GetCode()
 		end
 	end
 	table.sort(templates, function(a, b)
-		return a.AbsolutePosition.X < b.AbsolutePosition.X
+		return a.AbsolutePosition.y < b.AbsolutePosition.y
 	end)
 
 	local code = {}
