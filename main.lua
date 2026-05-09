@@ -209,7 +209,7 @@ local function CreateHL(char: Model)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), statsFrame)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), equippedFrame)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), inventoryFrame)
-	CreateUIGrid(UDim2.new(0.025, 0, 0.025, 0), UDim2.new(0.5, 0, 0.3, 0), statsFrame)
+	CreateUIGrid(UDim2.new(0.025, 0, 0.025, 0), UDim2.new(0.4, 0, 0.4, 0), statsFrame)
 
 	local equippedText = CreateTextLabel("Equipped", "Equipped: Glove Name", UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), equippedFrame)
 	local inventoryText = CreateTextLabel("Inventory", "Backpack: ...", UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), inventoryFrame)
