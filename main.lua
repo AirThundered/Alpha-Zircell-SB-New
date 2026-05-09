@@ -209,7 +209,7 @@ local function CreateHL(char: Model)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), statsFrame)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), equippedFrame)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), inventoryFrame)
-	CreateUIGrid(UDim2.new(0.025, 0, 0.025, 0), UDim2.new(0.4, 0, 0.4, 0), statsFrame)
+	CreateUIGrid(UDim2.new(0.025, 0, 0.025, 0), UDim2.new(0.5, 0, 0.3, 0), statsFrame)
 
 	local equippedText = CreateTextLabel("Equipped", "Equipped: Glove Name", UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), equippedFrame)
 	local inventoryText = CreateTextLabel("Inventory", "Backpack: ...", UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), inventoryFrame)
@@ -529,10 +529,40 @@ local function SetupGui()
 		end
 	end)
 
+	local killFrame = Instance.new("Frame", utilities)
+	killFrame.Size = UDim2.new(0.95, 0, 0.1, 0)
+	killFrame.BackgroundTransparency = 1
+	killFrame.LayoutOrder = 9
+
+	local killText = Instance.new("TextLabel", killFrame)
+	killText.Size = UDim2.new(0.7, 0, 1, 0)
+	killText.Text = "Reset Character"
+	killText.TextColor3 = Color3.fromRGB(255, 255, 255)
+	killText.TextScaled = true
+	killText.BackgroundTransparency = 1
+	killText.Font = Enum.Font.FredokaOne
+	killText.FontFace.Weight = Enum.FontWeight.Bold
+
+	local killButton = Instance.new("TextButton", killFrame)
+	killButton.Size = UDim2.new(0.3, 0, 1, 0)
+	killButton.Position = UDim2.new(0.7, 0, 0, 0)
+	killButton.Text = "Reset"
+	killButton.TextColor3 = Color3.fromRGB(0, 255, 0)
+	killButton.TextScaled = true
+	killButton.BackgroundTransparency = 1
+	killButton.Font = Enum.Font.FredokaOne
+	killButton.FontFace.Weight = Enum.FontWeight.Bold
+
+	killButton.Activated:Connect(function()
+		if player.Character and player.Character:FindFirstChild("Humanoid") and player.Character:FindFirstChild("Humanoid").Health > 0 then
+			player.Character:FindFirstChild("Humanoid").Health = 0
+		end
+	end)
+
 	local destroyFrame = Instance.new("Frame", utilities)
 	destroyFrame.Size = UDim2.new(0.95, 0, 0.1, 0)
 	destroyFrame.BackgroundTransparency = 1
-	destroyFrame.LayoutOrder = 9
+	destroyFrame.LayoutOrder = 10
 
 	local destroyText = Instance.new("TextLabel", destroyFrame)
 	destroyText.Size = UDim2.new(0.7, 0, 1, 0)
