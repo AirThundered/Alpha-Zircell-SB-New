@@ -5,6 +5,7 @@ local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 
+local running = true
 local ESPPlayerToggle = false
 local ESPLootToggle = false
 local OpenCloseButton = Enum.KeyCode.LeftControl
@@ -69,7 +70,7 @@ local function GetCode()
 		end
 	end
 	table.sort(templates, function(a, b)
-		return a.AbsolutePosition.X < b.AbsolutePosition.X
+		return a.AbsolutePosition.y < b.AbsolutePosition.y
 	end)
 
 	local code = {}
@@ -139,8 +140,7 @@ local function CreateHL(char: Model)
 	billboard.Size = UDim2.new(7, 0, 7, 0)
 	billboard.Active = true
 	billboard.AlwaysOnTop = true
-	billboard.LightInfluence = 1
-	billboard.MaxDistance = math.huge
+	billboard.MaxDistance = 300
 	billboard.ResetOnSpawn = false
 	billboard.StudsOffset = Vector3.new(7, 0, 0)
 	billboard.Parent = hrp
@@ -209,23 +209,19 @@ local function CreateHL(char: Model)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), statsFrame)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), equippedFrame)
 	CreateUIStroke(2, Color3.fromRGB(255, 255, 255), inventoryFrame)
-	CreateUIGrid(UDim2.new(0.025, 0, 0.025, 0), UDim2.new(0.3, 0, 0.3, 0), statsFrame)
+	CreateUIGrid(UDim2.new(0.025, 0, 0.025, 0), UDim2.new(0.4, 0, 0.4, 0), statsFrame)
 
 	local equippedText = CreateTextLabel("Equipped", "Equipped: Glove Name", UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), equippedFrame)
 	local inventoryText = CreateTextLabel("Inventory", "Backpack: ...", UDim2.new(1, 0, 1, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), inventoryFrame)
-	local jumpText = CreateTextLabel("Jump", "Jump: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0.5, 0), Color3.fromRGB(255, 255, 255), statsFrame, 2)
-	local killsText = CreateTextLabel("Kills", "Kills: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, 0.5, 0), Color3.fromRGB(255, 255, 255), statsFrame, 5)
-	local powerText = CreateTextLabel("Power", "Power: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 1)
-	local speedText = CreateTextLabel("Speed", "Speed: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 3)
-	local healthText = CreateTextLabel("Health", "Health: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 6)
-	local distanceText = CreateTextLabel("Distance", "Distance: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, 0.5, 0), Color3.fromRGB(255, 255, 255), statsFrame, 7)
-	local slapsText = CreateTextLabel("Slaps", "Slaps: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 4)
+	local jumpText = CreateTextLabel("Jump", "Jump: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0.5, 0), Color3.fromRGB(255, 255, 255), statsFrame, 1)
+	local speedText = CreateTextLabel("Speed", "Speed: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 2)
+	local healthText = CreateTextLabel("Health", "Health: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 4)
+	local distanceText = CreateTextLabel("Distance", "Distance: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0.5, 0, 0.5, 0), Color3.fromRGB(255, 255, 255), statsFrame, 5)
+	local slapsText = CreateTextLabel("Slaps", "Slaps: 0", UDim2.new(0.5, 0, 0.5, 0), UDim2.new(0, 0, 0, 0), Color3.fromRGB(255, 255, 255), statsFrame, 3)
 
 	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), equippedText)
 	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), inventoryText)
 	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), jumpText)
-	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), killsText)
-	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), powerText)
 	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), speedText)
 	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), healthText)
 	CreateUIStroke(2, Color3.fromRGB(0, 0, 0), distanceText)
@@ -242,7 +238,7 @@ local function RemoveHL(char)
 end
 
 local function CreateLootHL(loot)
-	if not loot or not loot:IsA("BasePart") and not loot:IsA("Model") then return end
+	if not loot or not (loot:IsA("Tool") or loot:IsA("Model")) then return end
 	local handle = loot:FindFirstChild("Handle")
 	if not handle then return end
 
@@ -265,8 +261,7 @@ local function CreateLootHL(loot)
 	billboard.Size = UDim2.new(5, 0, 3, 0)
 	billboard.Active = true
 	billboard.AlwaysOnTop = true
-	billboard.LightInfluence = 1
-	billboard.MaxDistance = math.huge
+	billboard.MaxDistance = 500
 	billboard.ResetOnSpawn = false
 	billboard.Parent = handle
 
@@ -533,6 +528,50 @@ local function SetupGui()
 			getCodeButton.TextColor3 = Color3.fromRGB(255, 0, 0)
 		end
 	end)
+
+	local destroyFrame = Instance.new("Frame", utilities)
+	destroyFrame.Size = UDim2.new(0.95, 0, 0.1, 0)
+	destroyFrame.BackgroundTransparency = 1
+	destroyFrame.LayoutOrder = 9
+
+	local destroyText = Instance.new("TextLabel", destroyFrame)
+	destroyText.Size = UDim2.new(0.7, 0, 1, 0)
+	destroyText.Text = "Destroy Script"
+	destroyText.TextColor3 = Color3.fromRGB(255, 255, 255)
+	destroyText.TextScaled = true
+	destroyText.BackgroundTransparency = 1
+	destroyText.Font = Enum.Font.FredokaOne
+	destroyText.FontFace.Weight = Enum.FontWeight.Bold
+
+	local destroyButton = Instance.new("TextButton", destroyFrame)
+	destroyButton.Size = UDim2.new(0.3, 0, 1, 0)
+	destroyButton.Position = UDim2.new(0.7, 0, 0, 0)
+	destroyButton.Text = "Destroy"
+	destroyButton.TextColor3 = Color3.fromRGB(0, 255, 0)
+	destroyButton.TextScaled = true
+	destroyButton.BackgroundTransparency = 1
+	destroyButton.Font = Enum.Font.FredokaOne
+	destroyButton.FontFace.Weight = Enum.FontWeight.Bold
+
+	destroyButton.Activated:Connect(function()
+		running = false
+		ESPPlayerToggle = false
+		ESPLootToggle = false
+		local itemsFolder = workspace:FindFirstChild("Items")
+		if not itemsFolder then return end
+		for _, loot in ipairs(itemsFolder:GetChildren()) do
+			RemoveLootHL(loot)
+		end
+		for _, plr in pairs(Players:GetPlayers()) do
+			if plr.Character then
+				RemoveHL(plr.Character)
+			end
+		end
+		if player.PlayerGui:FindFirstChild("ZircellGui") then
+			player.PlayerGui.ZircellGui:Destroy()
+		end
+		script:Destroy()
+	end)
 end
 
 local function UpdateHL(char)
@@ -558,8 +597,6 @@ local function UpdateHL(char)
 	local equippedText = equippedFrame:FindFirstChild("Equipped")
 	local inventoryText = inventoryFrame:FindFirstChild("Inventory")
 	local jumpText = statsFrame:FindFirstChild("Jump")
-	local killsText = statsFrame:FindFirstChild("Kills")
-	local powerText = statsFrame:FindFirstChild("Power")
 	local speedText = statsFrame:FindFirstChild("Speed")
 	local slapsText = statsFrame:FindFirstChild("Slaps")
 	local distanceText = statsFrame:FindFirstChild("Distance")
@@ -599,10 +636,6 @@ local function UpdateHL(char)
 		jumpText.Text = "Jump: " .. jmpStr
 	end
 
-	if powerText and powerText.Text ~= "Power: ??" then
-		powerText.Text = "Power: ??"
-	end
-
 	if inventoryText then
 		local itemCounts = {}
 		for _, tool in ipairs(plr.Backpack:GetChildren()) do
@@ -626,13 +659,6 @@ local function UpdateHL(char)
 		if inventoryText.Text ~= "Backpack: " .. text then
 			inventoryText.Text = "Backpack: " .. text
 		end
-	end
-
-	local success, countKills = pcall(function()
-		return player.PlayerGui.MatchPlayerlist.Playerlist.Clipper.Scroll[plr.Name].Kills.Text
-	end)
-	if success and killsText and killsText.Text ~= "Kills: " .. countKills then
-		killsText.Text = "Kills: " .. countKills
 	end
 end
 
@@ -658,29 +684,32 @@ local function CloseZircellFrame()
 end
 
 SetupGui()
-
-RunService.Heartbeat:Connect(function()
-	if ESPPlayerToggle then
-		for _, plr in ipairs(Players:GetPlayers()) do
-			UpdateHL(plr.Character)
+task.spawn(function()
+	while true do
+		if not running then break end
+		if ESPPlayerToggle then
+			for _, plr in ipairs(Players:GetPlayers()) do
+				UpdateHL(plr.Character)
+			end
 		end
-	end
-
-	if ESPLootToggle then
-		local itemsFolder = workspace:FindFirstChild("Items")
-		if itemsFolder then
-			for _, loot in ipairs(itemsFolder:GetChildren()) do
-				local handle = loot:FindFirstChild("Handle")
-				local billboard = handle and handle:FindFirstChild("Zircell_Billboard_Loot")
-				if billboard then
-					local distLabel = billboard:FindFirstChild("DistanceLabel")
-					if distLabel and handle then
-						local dist = (handle.Position - workspace.Camera.CFrame.Position).Magnitude
-						distLabel.Text = FormatNumber(dist, true)
+	
+		if ESPLootToggle then
+			local itemsFolder = workspace:FindFirstChild("Items")
+			if itemsFolder then
+				for _, loot in ipairs(itemsFolder:GetChildren()) do
+					local handle = loot:FindFirstChild("Handle")
+					local billboard = handle and handle:FindFirstChild("Zircell_Billboard_Loot")
+					if billboard then
+						local distLabel = billboard:FindFirstChild("DistanceLabel")
+						if distLabel and handle then
+							local dist = (handle.Position - workspace.Camera.CFrame.Position).Magnitude
+							distLabel.Text = FormatNumber(dist, true)
+						end
 					end
 				end
 			end
 		end
+		task.wait(0.1)
 	end
 end)
 
